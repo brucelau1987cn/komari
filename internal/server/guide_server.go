@@ -90,8 +90,14 @@ func (a *App) runGuideServer(controller guideController, cfg guideServerConfig) 
 
 func noStoreAPIResponses() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api") {
-			c.Header("Cache-Control", "no-store")
+		// API responses and the dynamically rendered SPA shell both depend on
+		// the current session/theme. Prevent stale auth state after re-login.
+		if strings.HasPrefix(c.Request.URL.Path, "/api") ||
+			c.Request.URL.Path == "/" ||
+			!strings.Contains(filepath.Base(c.Request.URL.Path), ".") {
+			c.Header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+			c.Header("Pragma", "no-cache")
+			c.Header("Expires", "0")
 		}
 		c.Next()
 	}

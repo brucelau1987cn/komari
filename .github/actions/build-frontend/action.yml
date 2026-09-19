@@ -42,6 +42,7 @@ runs:
         else
           git clone --depth=1 "${{ inputs.repository }}" komari-web
         fi
+        python3 scripts/patch-frontend.py
         cd komari-web
         npm install
         npm run build

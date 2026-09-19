@@ -200,6 +200,12 @@ func static(r *gin.RouterGroup, noRoute func(handlers ...gin.HandlerFunc), force
 
 	// 核心逻辑：渲染 Index.html
 	serveIndex := func(c *gin.Context) {
+		// index.html is rendered dynamically from the current theme and settings.
+		// Never let a browser, PWA, or reverse proxy reuse a stale auth shell.
+		c.Header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+		c.Header("Pragma", "no-cache")
+		c.Header("Expires", "0")
+
 		reqPath := c.Request.URL.Path
 		cfg := getConfig()
 

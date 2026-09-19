@@ -39,8 +39,8 @@ func TestGuideNoRouteRejectsUnknownAPIAndRedirectsPages(t *testing.T) {
 	if apiResponse.Code != http.StatusNotFound {
 		t.Fatalf("API status = %d, want %d", apiResponse.Code, http.StatusNotFound)
 	}
-	if got := apiResponse.Header().Get("Cache-Control"); got != "no-store" {
-		t.Fatalf("API cache control = %q, want no-store", got)
+	if got := apiResponse.Header().Get("Cache-Control"); got != "no-store, no-cache, must-revalidate, max-age=0" {
+		t.Fatalf("API cache control = %q, want no-store policy", got)
 	}
 
 	pageResponse := httptest.NewRecorder()
@@ -50,6 +50,9 @@ func TestGuideNoRouteRejectsUnknownAPIAndRedirectsPages(t *testing.T) {
 	}
 	if got := pageResponse.Header().Get("Location"); got != "/install" {
 		t.Fatalf("redirect location = %q, want /install", got)
+	}
+	if got := pageResponse.Header().Get("Cache-Control"); got != "no-store, no-cache, must-revalidate, max-age=0" {
+		t.Fatalf("page cache control = %q, want no-store policy", got)
 	}
 }
 
